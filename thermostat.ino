@@ -1,6 +1,7 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 
+// Should contain 'wifi_ssid' and 'wifi_password'
 #include "wifi_config.h"
 
 ESP8266WebServer server(80);
@@ -27,12 +28,12 @@ void setup_wifi() {
 
 void setup() {
   Serial.begin(115200);
-  
+
   setup_wifi();
-  
+
   pinMode(D0, OUTPUT);
   pinMode(D1, OUTPUT);
-  
+
   server.on("/", handleSetTemperature);
   server.begin();
   Serial.println("HTTP server started");
@@ -67,7 +68,7 @@ void handleSetTemperature() {
     z = (z+1) % 2;
     yield();
   }
-  
+
   server.send(204, "text/html", "");
 }
 
