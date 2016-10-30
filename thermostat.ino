@@ -4,6 +4,10 @@
 // Should contain 'wifi_ssid' and 'wifi_password'
 #include "wifi_config.h"
 
+// Pins connected to incremental rotary encoder
+#define OUT0 D0
+#define OUT1 D1
+
 ESP8266WebServer server(80);
 
 void setup_wifi() {
@@ -31,8 +35,8 @@ void setup() {
 
   setup_wifi();
 
-  pinMode(D0, OUTPUT);
-  pinMode(D1, OUTPUT);
+  pinMode(OUT0, OUTPUT);
+  pinMode(OUT1, OUTPUT);
 
   server.on("/", handleSetTemperature);
   server.begin();
@@ -50,9 +54,9 @@ void handleSetTemperature() {
   int z = 0;
   // Set temperature to OFF
   for(uint8_t i = 0; i < 60; ++i) {
-    digitalWrite(D1, z);
+    digitalWrite(OUT1, z);
     delay(30);
-    digitalWrite(D0, z);
+    digitalWrite(OUT0, z);
     delay(30);
 
     z = (z+1) % 2;
@@ -60,9 +64,9 @@ void handleSetTemperature() {
   }
 
   for(uint8_t i = 0; i < temp*2; ++i) {
-    digitalWrite(D0, z);
+    digitalWrite(OUT0, z);
     delay(30);
-    digitalWrite(D1, z);
+    digitalWrite(OUT1, z);
     delay(30);
 
     z = (z+1) % 2;
