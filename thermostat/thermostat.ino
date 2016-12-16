@@ -63,7 +63,10 @@ void handleSetTemperature() {
     yield();
   }
 
-  for(uint8_t i = 0; i < temp*2; ++i) {
+  /* Substract 4.5 from the given temperature to compute the number of steps
+   * required to set the desired temperature, as the temperature directly jumps
+   * from OFF tp 5C. */
+  for(uint8_t i = 0; i < (temp-4.5)*2; ++i) {
     digitalWrite(OUT0, z);
     delay(30);
     digitalWrite(OUT1, z);
