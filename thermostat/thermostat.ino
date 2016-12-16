@@ -44,10 +44,10 @@ void setup() {
 }
 
 void handleSetTemperature() {
-  uint8 temp = -1;
+  float temp = -1;
   for ( uint8_t i = 0; i < server.args(); i++ ) {
     if(server.argName(i) == "temp") {
-      temp = server.arg(i).toInt();
+      temp = server.arg(i).toFloat();
     }
   }
 
