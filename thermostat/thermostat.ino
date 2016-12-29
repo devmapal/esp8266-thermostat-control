@@ -1,5 +1,7 @@
 #include <ESP8266WiFi.h>
-#include <ESP8266WebServer.h>
+#include <ESP8266HTTPClient.h>
+
+#include <ArduinoJson.h>
 
 // Should contain 'wifi_ssid' and 'wifi_password'
 #include "wifi_config.h"
@@ -8,7 +10,6 @@
 #define OUT0 D0
 #define OUT1 D1
 
-ESP8266WebServer server(80);
 
 void setup_wifi() {
   delay(10);
@@ -37,20 +38,9 @@ void setup() {
 
   pinMode(OUT0, OUTPUT);
   pinMode(OUT1, OUTPUT);
-
-  server.on("/", handleSetTemperature);
-  server.begin();
-  Serial.println("HTTP server started");
 }
 
-void handleSetTemperature() {
-  float temp = -1;
-  for ( uint8_t i = 0; i < server.args(); i++ ) {
-    if(server.argName(i) == "temp") {
-      temp = server.arg(i).toFloat();
-    }
-  }
-
+void setTemperature(float temp) {
   int z = 0;
   // Set temperature to OFF
   for(uint8_t i = 0; i < 60; ++i) {
@@ -60,7 +50,6 @@ void handleSetTemperature() {
     delay(30);
 
     z = (z+1) % 2;
-    yield();
   }
 
   /* Substract 4.5 from the given temperature to compute the number of steps
@@ -73,15 +62,59 @@ void handleSetTemperature() {
     delay(30);
 
     z = (z+1) % 2;
-    yield();
+  }
+}
+
+void updateTemperatureIfChanged() {
+  static float old_temp = -1;
+
+  HTTPClient http;
+  http.begin("http://192.168.178.2", 8123, "/api/states/input_slider.hallway_thermostat");
+  int httpCode = http.GET();
+
+  if(httpCode > 0) {
+      // file found at server
+      if(httpCode == HTTP_CODE_OK) {
+          String payload = http.getString();
+
+          /*
+           * {
+           *   "attributes": {
+           *     "friendly_name": "Thermostat temperature",
+           *       "max": 22.0,
+           *       "min": 0.0,
+           *       "step": 0.5
+           *   },
+           *   "entity_id": "input_slider.hallway_thermostat",
+           *   "last_changed": "2016-12-28T18:12:40.244266+00:00",
+           *   "last_updated": "2016-12-28T18:12:40.244266+00:00",
+           *   "state": "0.0"
+           * }
+           */
+          const int BUFFER_SIZE = JSON_OBJECT_SIZE(4) + JSON_OBJECT_SIZE(5);
+          StaticJsonBuffer<BUFFER_SIZE> jsonBuffer;
+
+          JsonObject& root = jsonBuffer.parseObject(payload);
+          if (!root.success()) {
+            Serial.println("parseObject() failed");
+            return;
+          }
+
+          float temp = root["state"];
+          if(temp != old_temp) {
+            old_temp = temp;
+            setTemperature(temp);
+          }
+      }
   }
 
-  server.send(204, "text/html", "");
+  http.end();
 }
 
 void loop() {
   if(WiFi.status() != WL_CONNECTED) {
     setup_wifi();
   }
-  server.handleClient();
+
+  updateTemperatureIfChanged();
 }
