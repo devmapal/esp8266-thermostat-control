@@ -1,6 +1,10 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 
+extern "C" {
+#include "user_interface.h"
+}
+
 #include <ArduinoJson.h>
 
 // Should contain 'wifi_ssid' and 'wifi_password'
@@ -122,4 +126,9 @@ void loop() {
   }
 
   updateTemperatureIfChanged();
+
+  // Go into light sleep for 60 seconds
+  wifi_set_sleep_type(LIGHT_SLEEP_T);
+  delay(60000); // 60s
+  wifi_set_sleep_type(NONE_SLEEP_T);
 }
