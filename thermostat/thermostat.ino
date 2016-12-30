@@ -90,9 +90,14 @@ void updateTemperatureIfChanged() {
            *   "last_updated": "2016-12-28T18:12:40.244266+00:00",
            *   "state": "0.0"
            * }
+           *
+           *
+           * This yields 160, which is not sufficient:
+           * const int BUFFER_SIZE = JSON_OBJECT_SIZE(4) + JSON_OBJECT_SIZE(5);
+           *
+           * I found 500 to work by trial and error.
            */
-          const int BUFFER_SIZE = JSON_OBJECT_SIZE(4) + JSON_OBJECT_SIZE(5);
-          StaticJsonBuffer<BUFFER_SIZE> jsonBuffer;
+          StaticJsonBuffer<500> jsonBuffer;
 
           JsonObject& root = jsonBuffer.parseObject(payload);
           if (!root.success()) {
