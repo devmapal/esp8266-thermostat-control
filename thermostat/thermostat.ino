@@ -69,7 +69,7 @@ void updateTemperatureIfChanged() {
   static float old_temp = -1;
 
   HTTPClient http;
-  http.begin("http://192.168.178.2", 8123, "/api/states/input_slider.hallway_thermostat");
+  http.begin("192.168.178.2", 8123, "/api/states/input_slider.hallway_thermostat");
   int httpCode = http.GET();
 
   if(httpCode > 0) {
