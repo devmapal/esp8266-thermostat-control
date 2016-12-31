@@ -1,3 +1,4 @@
+#include <EEPROM.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 
@@ -13,6 +14,8 @@ extern "C" {
 // Pins connected to incremental rotary encoder
 #define OUT0 D0
 #define OUT1 D1
+
+#define OLD_TEMP_EEPROM_ADDRESS 0
 
 
 void setup_wifi() {
@@ -70,7 +73,8 @@ void setTemperature(float temp) {
 }
 
 void updateTemperatureIfChanged() {
-  static float old_temp = -1;
+  float old_temp;
+  EEPROM.get(OLD_TEMP_EEPROM_ADDRESS, old_temp);
 
   HTTPClient http;
   http.begin("192.168.178.2", 8123, "/api/states/input_slider.hallway_thermostat");
@@ -111,7 +115,7 @@ void updateTemperatureIfChanged() {
 
           float temp = root["state"];
           if(temp != old_temp) {
-            old_temp = temp;
+            EEPROM.put(OLD_TEMP_EEPROM_ADDRESS, temp);
             setTemperature(temp);
           }
       }
