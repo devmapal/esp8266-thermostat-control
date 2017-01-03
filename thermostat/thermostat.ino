@@ -13,6 +13,10 @@
 
 #define OLD_TEMP_EEPROM_ADDRESS 0
 
+IPAddress ip(192, 168, 178, 201);
+IPAddress gateway(192, 168, 178, 1);
+IPAddress subnet(255, 255, 255, 0);
+IPAddress dns(192, 168, 178, 1);
 
 void setup_wifi() {
   delay(10);
@@ -21,6 +25,7 @@ void setup_wifi() {
   Serial.print("Connecting to ");
   Serial.println(wifi_ssid);
 
+  WiFi.config(ip, dns, gateway, subnet);
   WiFi.begin(wifi_ssid, wifi_password);
 
   while (WiFi.status() != WL_CONNECTED) {
