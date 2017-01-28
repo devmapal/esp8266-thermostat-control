@@ -6,9 +6,13 @@
 // Should contain 'wifi_ssid' and 'wifi_password'
 #include "wifi_config.h"
 
-// Pins connected to incremental rotary encoder
+// Pins connected to incremental rotary encoder inputs of thermostat
 #define OUT0 D5
 #define OUT1 D1
+
+// Pins connected to incremental rotary encoder
+#define IN0 D2
+#define IN1 D3
 
 IPAddress ip(192, 168, 178, 210);
 IPAddress gateway(192, 168, 178, 1);
@@ -36,11 +40,26 @@ void setup_wifi() {
   Serial.println(WiFi.localIP());
 }
 
+void in0_change() {
+  int in0 = digitalRead(IN0);
+  digitalWrite(OUT0, in0);
+}
+
+void in1_change() {
+  int in1 = digitalRead(IN1);
+  digitalWrite(OUT1, in1);
+}
+
 void setup() {
   Serial.begin(115200);
 
   pinMode(OUT0, OUTPUT);
   pinMode(OUT1, OUTPUT);
+
+  pinMode(IN0, INPUT_PULLUP);
+  pinMode(IN1, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(IN0), in0_change, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(IN1), in1_change, CHANGE);
 }
 
 void setTemperature(float temp) {
