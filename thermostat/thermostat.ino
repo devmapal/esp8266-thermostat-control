@@ -13,7 +13,7 @@
 
 #define OLD_TEMP_EEPROM_ADDRESS 0
 
-IPAddress ip(192, 168, 178, 201);
+IPAddress ip(192, 168, 178, 210);
 IPAddress gateway(192, 168, 178, 1);
 IPAddress subnet(255, 255, 255, 0);
 IPAddress dns(192, 168, 178, 1);
