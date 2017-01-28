@@ -40,20 +40,10 @@ void setup_wifi() {
 }
 
 void setup() {
-
-  // Connect D0 to RST to wake up
-  pinMode(D0, WAKEUP_PULLUP);
-
-  setup_wifi();
   Serial.begin(115200);
 
   pinMode(OUT0, OUTPUT);
   pinMode(OUT1, OUTPUT);
-
-  updateTemperatureIfChanged();
-
-  // Go into deep sleep for 60 seconds
-  ESP.deepSleep(60 * 1000000);
 }
 
 void setTemperature(float temp) {
@@ -133,4 +123,17 @@ void updateTemperatureIfChanged() {
   http.end();
 }
 
-void loop() {}
+void loop() {
+  setup_wifi();
+
+  updateTemperatureIfChanged();
+
+  // Sleep for 60 seconds
+  WiFi.disconnect();
+  WiFi.mode(WIFI_OFF);
+  WiFi.forceSleepBegin(60 * 1000000L);
+  delay(60 * 1000);
+
+  // Wakeup
+  WiFi.mode(WIFI_STA);
+}
