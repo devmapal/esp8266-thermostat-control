@@ -40,12 +40,12 @@ void setup_wifi() {
 }
 
 void setup() {
-  Serial.begin(9600);
 
   // Connect D0 to RST to wake up
   pinMode(D0, WAKEUP_PULLUP);
 
   setup_wifi();
+  Serial.begin(115200);
 
   pinMode(OUT0, OUTPUT);
   pinMode(OUT1, OUTPUT);
