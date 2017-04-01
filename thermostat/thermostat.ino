@@ -1,5 +1,6 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
+#include <ESP8266httpUpdate.h>
 
 #include <ArduinoJson.h>
 
@@ -14,7 +15,11 @@
 #define IN0 D2
 #define IN1 D3
 
-IPAddress ip(192, 168, 178, 210);
+// File for next update
+#define UPDATE_URI "http://192.168.178.2/thermostat/kids.v0001.bin"
+
+// IPAddress ip(192, 168, 178, 210);  // Hallway
+IPAddress ip(192, 168, 178, 211);     // Kids room
 IPAddress gateway(192, 168, 178, 1);
 IPAddress subnet(255, 255, 255, 0);
 IPAddress dns(192, 168, 178, 1);
@@ -91,7 +96,7 @@ void updateTemperatureIfChanged() {
   static float old_temp = 0.0f;
 
   HTTPClient http;
-  http.begin("192.168.178.2", 8123, "/api/states/input_slider.hallway_thermostat");
+  http.begin("192.168.178.2", 8123, "/api/states/input_slider.lenyas_room_thermostat");
   int httpCode = http.GET();
 
   if(httpCode > 0) {
@@ -140,6 +145,9 @@ void updateTemperatureIfChanged() {
 
 void loop() {
   setup_wifi();
+
+  // Try to update
+  ESPhttpUpdate.update(UPDATE_URI);
 
   updateTemperatureIfChanged();
 
